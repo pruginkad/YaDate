@@ -56,12 +56,21 @@ namespace YaDate
             {
                 listOfPeriods = ProcessREVIEW(startDate, endDate);
             }
-
+            if (sPeriodType == "YEAR")
+            {
+                listOfPeriods = ProcessYEAR(startDate, endDate);
+            }
+            if (sPeriodType == "QUARTER")
+            {
+                listOfPeriods = ProcessQUARTER(startDate, endDate);
+            }
+            
             Console.WriteLine(listOfPeriods.Count);
             for (var i = 0; i < listOfPeriods.Count; i++)
             {
                 var d1 = listOfPeriods[i].date1;
                 var d2 = listOfPeriods[i].date2;
+                //format = "yyyy-MM-dd";
                 Console.WriteLine($"{d1.ToString(format)} {d2.ToString(format)}");
             }
         }
@@ -177,6 +186,75 @@ namespace YaDate
             }
             return listOfPeriods;
         }
+
+        static List<Period> ProcessYEAR(DateTime startDate, DateTime endDate)
+        {
+            //YEAR — год c 1 января по 31 декабря.
+            DateTime curDate = new DateTime();
+
+            curDate = startDate;
+            List<Period> listOfPeriods = new List<Period>();
+            //Find last day of week
+
+            Period temp_pair = new Period();
+            temp_pair.date1 = curDate;
+            temp_pair.date2 = new DateTime(curDate.Year, 12, 31);
+
+            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+
+            listOfPeriods.Add(temp_pair);
+            curDate = temp_pair.date2;
+
+            while (curDate < endDate)
+            {
+                temp_pair = new Period();
+                temp_pair.date1 = curDate.AddDays(1);
+                temp_pair.date2 = curDate.AddYears(1);
+                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+                listOfPeriods.Add(temp_pair);
+                curDate = temp_pair.date2;
+            }
+            return listOfPeriods;
+        }
+
+        static DateTime QuarterEndDate(DateTime curDate)
+        {
+            //Спионерил в интернете
+            int quarterNumber = (curDate.Month - 1) / 3 + 1;
+            DateTime firstDayOfQuarter = new DateTime(curDate.Year, (quarterNumber - 1) * 3 + 1, 1);
+            DateTime lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+            DateTime date = lastDayOfQuarter;
+            return date;
+        }
+        static List<Period> ProcessQUARTER(DateTime startDate, DateTime endDate)
+        {
+            //интервалы в три месяца: январь — март, апрель — июнь, июль — сентябрь, октябрь — декабрь.
+            DateTime curDate = new DateTime();
+
+            curDate = startDate;
+            List<Period> listOfPeriods = new List<Period>();
+            //Find last day of week
+
+            Period temp_pair = new Period();
+            temp_pair.date1 = curDate;
+            temp_pair.date2 = QuarterEndDate(curDate);
+
+            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+
+            listOfPeriods.Add(temp_pair);
+            curDate = temp_pair.date2;
+
+            while (curDate < endDate)
+            {
+                temp_pair = new Period();
+                temp_pair.date1 = curDate.AddDays(1);
+                temp_pair.date2 = QuarterEndDate(temp_pair.date1);
+                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+                listOfPeriods.Add(temp_pair);
+                curDate = temp_pair.date2;
+            }
+            return listOfPeriods;
+        }
         static void Main(string[] args)
         {
             //sPeriodType = Console.ReadLine();
@@ -188,7 +266,13 @@ namespace YaDate
             //string sPeriodType = "WEEK";
             //string sPeriod = "2020-01-26 2020-03-23";
             
-            string sPeriodType = "REVIEW";
+            //string sPeriodType = "REVIEW";
+            //string sPeriod = "2016-09-20 2022-11-30";
+            
+            //string sPeriodType = "YEAR";
+            //string sPeriod = "2016-09-20 2022-11-30";
+
+            string sPeriodType = "QUARTER";
             string sPeriod = "2016-09-20 2022-11-30";
 
             MainProcess(sPeriodType, sPeriod);
