@@ -52,6 +52,10 @@ namespace YaDate
             {
                 listOfPeriods = ProcessMONTH(startDate, endDate);
             }
+            if (sPeriodType == "REVIEW")
+            {
+                listOfPeriods = ProcessREVIEW(startDate, endDate);
+            }
 
             Console.WriteLine(listOfPeriods.Count);
             for (var i = 0; i < listOfPeriods.Count; i++)
@@ -128,6 +132,51 @@ namespace YaDate
             }
             return listOfPeriods;
         }
+
+        static DateTime GetReviewLastDate(DateTime curDate)
+        {
+            DateTime date2;
+            if (curDate.Month >= 4 && curDate.Month <= 9)
+            {//summer time
+                date2 = new DateTime(curDate.Year, 9, 30);//September
+            }
+            else
+            { //Winter time
+                int year = curDate.Month <= 12 ? curDate.Year + 1 : curDate.Year;
+                date2 = new DateTime(year, 3, 31);//March
+            }
+            return date2;
+        }
+        static List<Period> ProcessREVIEW(DateTime startDate, DateTime endDate)
+        {
+            //REVIEW — периоды, за которые оцениваются достижения сотрудников Яндекса. 
+            //Летний период длится с 1 апреля по 30 сентября, зимний — с 1 октября по 31 марта.
+            DateTime curDate = new DateTime();
+
+            curDate = startDate;
+            List<Period> listOfPeriods = new List<Period>();
+            //Find last day of week
+
+            Period temp_pair = new Period();
+            temp_pair.date1 = curDate;
+            temp_pair.date2 = GetReviewLastDate(curDate);
+            
+            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+
+            listOfPeriods.Add(temp_pair);
+            curDate = temp_pair.date2;
+
+            while (curDate < endDate)
+            {
+                temp_pair = new Period();
+                temp_pair.date1 = curDate.AddDays(1);
+                temp_pair.date2 = GetReviewLastDate(temp_pair.date1);
+                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+                listOfPeriods.Add(temp_pair);
+                curDate = temp_pair.date2;
+            }
+            return listOfPeriods;
+        }
         static void Main(string[] args)
         {
             //sPeriodType = Console.ReadLine();
@@ -135,9 +184,12 @@ namespace YaDate
 
             //string sPeriodType = "MONTH";
             //string sPeriod = "2020-01-10 2020-03-25";
+
+            //string sPeriodType = "WEEK";
+            //string sPeriod = "2020-01-26 2020-03-23";
             
-            string sPeriodType = "WEEK";
-            string sPeriod = "2020-01-26 2020-03-23";
+            string sPeriodType = "REVIEW";
+            string sPeriod = "2016-09-20 2022-11-30";
 
             MainProcess(sPeriodType, sPeriod);
         }
