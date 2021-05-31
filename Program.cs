@@ -46,23 +46,23 @@ namespace YaDate
 
             if (sPeriodType == "WEEK")
             {
-                listOfPeriods = ProcessWEEK(startDate, endDate);
+                listOfPeriods = ProcessPeriod(startDate, endDate, WEEKEndDate);
             }
             if (sPeriodType == "MONTH")
             {
-                listOfPeriods = ProcessMONTH(startDate, endDate);
+                listOfPeriods = ProcessPeriod(startDate, endDate, MONTHEndDate);
             }
             if (sPeriodType == "REVIEW")
             {
-                listOfPeriods = ProcessREVIEW(startDate, endDate);
+                listOfPeriods = ProcessPeriod(startDate, endDate, REVIEWEndDate);
             }
             if (sPeriodType == "YEAR")
             {
-                listOfPeriods = ProcessYEAR(startDate, endDate);
+                listOfPeriods = ProcessPeriod(startDate, endDate, YEAREndDate);
             }
             if (sPeriodType == "QUARTER")
             {
-                listOfPeriods = ProcessQUARTER(startDate, endDate);
+                listOfPeriods = ProcessPeriod(startDate, endDate, QUARTEREndDate);
             }
             
             Console.WriteLine(listOfPeriods.Count);
@@ -82,68 +82,28 @@ namespace YaDate
                 temp_pair.date2 = endDate;
             }
         }
-        static List<Period> ProcessMONTH(DateTime startDate, DateTime endDate)
+
+        static DateTime MONTHEndDate(DateTime curDate)
         {
-            DateTime curDate = new DateTime();
-
-            curDate = startDate;
-            List<Period> listOfPeriods = new List<Period>();
-            //Find last day of first month
-            Period temp_pair = new Period();
-            temp_pair.date1 = curDate;
-            temp_pair.date2 = new DateTime(curDate.Year, curDate.Month, DateTime.DaysInMonth(curDate.Year, curDate.Month));
-            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-
-            listOfPeriods.Add(temp_pair);
-            curDate = temp_pair.date2;
-            while (curDate < endDate)
-            {
-                temp_pair = new Period();
-                temp_pair.date1 = curDate.AddDays(1);
-                temp_pair.date2 = curDate.AddMonths(1);
-                
-                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-                
-                listOfPeriods.Add(temp_pair);
-                curDate = temp_pair.date2;
-            }
-            return listOfPeriods;
+            DateTime date = new DateTime(curDate.Year, curDate.Month, DateTime.DaysInMonth(curDate.Year, curDate.Month));
+            return date;
         }
-        static List<Period> ProcessWEEK(DateTime startDate, DateTime endDate)
-        {
-            DateTime curDate = new DateTime();
 
-            curDate = startDate;
-            List<Period> listOfPeriods = new List<Period>();
-            //Find last day of week
-            
-            Period temp_pair = new Period();
-            temp_pair.date1 = curDate;
-            var DaysTillSunday = 7 - (int)temp_pair.date1.DayOfWeek;
-            if(DaysTillSunday == 7)
+        static DateTime WEEKEndDate(DateTime curDate)
+        {
+            var DaysTillSunday = 7 - (int)curDate.DayOfWeek;
+            if (DaysTillSunday == 7)
             {
                 DaysTillSunday = 0;
             }
-            temp_pair.date2 = temp_pair.date1.AddDays(DaysTillSunday);
-            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-
-            listOfPeriods.Add(temp_pair);
-            curDate = temp_pair.date2;
-
-            while (curDate < endDate)
-            {
-                temp_pair = new Period();
-                temp_pair.date1 = curDate.AddDays(1);
-                temp_pair.date2 = curDate.AddDays(7);
-                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-                listOfPeriods.Add(temp_pair);
-                curDate = temp_pair.date2;
-            }
-            return listOfPeriods;
+            DateTime date = curDate.AddDays(DaysTillSunday);
+            return date;
         }
-
-        static DateTime GetReviewLastDate(DateTime curDate)
+ 
+        static DateTime REVIEWEndDate(DateTime curDate)
         {
+            //REVIEW — периоды, за которые оцениваются достижения сотрудников Яндекса. 
+            //Летний период длится с 1 апреля по 30 сентября, зимний — с 1 октября по 31 марта.
             DateTime date2;
             if (curDate.Month >= 4 && curDate.Month <= 9)
             {//summer time
@@ -156,69 +116,17 @@ namespace YaDate
             }
             return date2;
         }
-        static List<Period> ProcessREVIEW(DateTime startDate, DateTime endDate)
-        {
-            //REVIEW — периоды, за которые оцениваются достижения сотрудников Яндекса. 
-            //Летний период длится с 1 апреля по 30 сентября, зимний — с 1 октября по 31 марта.
-            DateTime curDate = new DateTime();
 
-            curDate = startDate;
-            List<Period> listOfPeriods = new List<Period>();
-            //Find last day of week
-
-            Period temp_pair = new Period();
-            temp_pair.date1 = curDate;
-            temp_pair.date2 = GetReviewLastDate(curDate);
-            
-            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-
-            listOfPeriods.Add(temp_pair);
-            curDate = temp_pair.date2;
-
-            while (curDate < endDate)
-            {
-                temp_pair = new Period();
-                temp_pair.date1 = curDate.AddDays(1);
-                temp_pair.date2 = GetReviewLastDate(temp_pair.date1);
-                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-                listOfPeriods.Add(temp_pair);
-                curDate = temp_pair.date2;
-            }
-            return listOfPeriods;
-        }
-
-        static List<Period> ProcessYEAR(DateTime startDate, DateTime endDate)
+        static DateTime YEAREndDate(DateTime curDate)
         {
             //YEAR — год c 1 января по 31 декабря.
-            DateTime curDate = new DateTime();
-
-            curDate = startDate;
-            List<Period> listOfPeriods = new List<Period>();
-            //Find last day of week
-
-            Period temp_pair = new Period();
-            temp_pair.date1 = curDate;
-            temp_pair.date2 = new DateTime(curDate.Year, 12, 31);
-
-            CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-
-            listOfPeriods.Add(temp_pair);
-            curDate = temp_pair.date2;
-
-            while (curDate < endDate)
-            {
-                temp_pair = new Period();
-                temp_pair.date1 = curDate.AddDays(1);
-                temp_pair.date2 = curDate.AddYears(1);
-                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
-                listOfPeriods.Add(temp_pair);
-                curDate = temp_pair.date2;
-            }
-            return listOfPeriods;
+            DateTime date = new DateTime(curDate.Year, 12, 31); ;
+            return date;
         }
 
-        static DateTime QuarterEndDate(DateTime curDate)
+        static DateTime QUARTEREndDate(DateTime curDate)
         {
+            //интервалы в три месяца: январь — март, апрель — июнь, июль — сентябрь, октябрь — декабрь.
             //Спионерил в интернете
             int quarterNumber = (curDate.Month - 1) / 3 + 1;
             DateTime firstDayOfQuarter = new DateTime(curDate.Year, (quarterNumber - 1) * 3 + 1, 1);
@@ -226,18 +134,19 @@ namespace YaDate
             DateTime date = lastDayOfQuarter;
             return date;
         }
-        static List<Period> ProcessQUARTER(DateTime startDate, DateTime endDate)
+
+        delegate DateTime PeriodProcessingDelegate(DateTime curDate);
+        static List<Period> ProcessPeriod(DateTime startDate, DateTime endDate, PeriodProcessingDelegate func)
         {
-            //интервалы в три месяца: январь — март, апрель — июнь, июль — сентябрь, октябрь — декабрь.
+            
             DateTime curDate = new DateTime();
 
             curDate = startDate;
             List<Period> listOfPeriods = new List<Period>();
-            //Find last day of week
 
             Period temp_pair = new Period();
             temp_pair.date1 = curDate;
-            temp_pair.date2 = QuarterEndDate(curDate);
+            temp_pair.date2 = func(curDate);
 
             CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
 
@@ -248,7 +157,7 @@ namespace YaDate
             {
                 temp_pair = new Period();
                 temp_pair.date1 = curDate.AddDays(1);
-                temp_pair.date2 = QuarterEndDate(temp_pair.date1);
+                temp_pair.date2 = func(temp_pair.date1);
                 CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
                 listOfPeriods.Add(temp_pair);
                 curDate = temp_pair.date2;
