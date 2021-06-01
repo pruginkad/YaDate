@@ -158,10 +158,16 @@ namespace YaDate
                 temp_pair = new Period();
                 temp_pair.date1 = curDate.AddDays(1);
                 temp_pair.date2 = func(temp_pair.date1);
-                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
                 listOfPeriods.Add(temp_pair);
                 curDate = temp_pair.date2;
             }
+            if(listOfPeriods.Count > 1)
+            {
+                //trim last period
+                CheckIfEndOfPeriodCorrect(ref temp_pair, endDate);
+            }
+            
+
             return listOfPeriods;
         }
         static void Main(string[] args)
