@@ -172,25 +172,27 @@ namespace YaDate
         }
         static void Main(string[] args)
         {
-            //sPeriodType = Console.ReadLine();
-            //sPeriod = Console.ReadLine();
+            //string sPeriodType = Console.ReadLine();
+            //string sPeriod = Console.ReadLine();
 
             //string sPeriodType = "MONTH";
             //string sPeriod = "2020-01-10 2020-03-25";
 
-            //string sPeriodType = "WEEK";
-            //string sPeriod = "2020-01-26 2020-03-23";
+            string sPeriodType = "WEEK";
+            string sPeriod = "2020-01-26 2020-03-23";
             
+
             //string sPeriodType = "REVIEW";
             //string sPeriod = "2016-09-20 2022-11-30";
-            
+
             //string sPeriodType = "YEAR";
             //string sPeriod = "2016-09-20 2022-11-30";
 
-            string sPeriodType = "QUARTER";
-            string sPeriod = "2016-09-20 2022-11-30";
+            //string sPeriodType = "QUARTER";
+            //string sPeriod = "2016-09-20 2022-11-30";
 
             MainProcess(sPeriodType, sPeriod);
+            
         }
     }
 }
