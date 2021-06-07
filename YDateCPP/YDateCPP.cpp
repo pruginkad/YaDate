@@ -64,6 +64,28 @@ static std::tm AddDays(std::tm curDate, int days)
     return stack;
 }
 
+static int GetDaysInMonth(std::tm curDate)
+{
+    std::tm date = curDate;
+    int i = 0;
+    for (i = 28; i <= 31; i++)
+    {
+        date.tm_mday = i;
+        Normalize(date);
+        if (date.tm_mon != curDate.tm_mon)
+        {
+            break;
+        }
+    }
+    return i - 1;    
+}
+
+static std::tm MONTHEndDate(std::tm curDate)
+{
+    curDate.tm_mday = GetDaysInMonth(curDate);
+    return curDate;
+}
+
 static std::tm WEEKEndDate(std::tm curDate)
 {
     int DaysTillSunday = 7 - (int)curDate.tm_wday;
@@ -74,6 +96,54 @@ static std::tm WEEKEndDate(std::tm curDate)
     
     std::tm date = AddDays(curDate, DaysTillSunday);
     return date;
+}
+
+static std::tm REVIEWEndDate(std::tm curDate)
+{
+    //REVIEW — периоды, за которые оцениваются достижения сотрудников Яндекса. 
+    //Летний период длится с 1 апреля по 30 сентября, зимний — с 1 октября по 31 марта.
+    std::tm date2 = curDate;
+    if (curDate.tm_mon >= 3 && curDate.tm_mon <= 8)
+    {//summer time
+        date2.tm_mon = 8;//September
+        date2.tm_mday = 30;
+    }
+    else
+    { //Winter time
+        date2.tm_year = curDate.tm_mon <= 11 ? curDate.tm_year + 1 : curDate.tm_year;
+        date2.tm_mon = 2;//March
+        date2.tm_mday = 31;
+    }
+    Normalize(date2);
+    return date2;
+}
+
+static std::tm YEAREndDate(std::tm curDate)
+{
+    //YEAR — год c 1 января по 31 декабря.
+    std::tm date = curDate;
+    date.tm_mon = 11;//Dec
+    date.tm_mday = 31;
+    return date;
+}
+
+static std::tm QUARTEREndDate(std::tm curDate)
+{
+    //интервалы в три месяца: январь — март, апрель — июнь, июль — сентябрь, октябрь — декабрь.
+    //Спионерил в интернете
+    int quarterNumber = (curDate.tm_mon) / 3 + 1;
+    std::tm firstDayOfQuarter = curDate;
+    firstDayOfQuarter.tm_mon = (quarterNumber - 1) * 3;
+    firstDayOfQuarter.tm_mday = 1;
+    Normalize(firstDayOfQuarter);
+
+    auto lastDayOfQuarter = firstDayOfQuarter;
+    lastDayOfQuarter.tm_mon += 3;
+    Normalize(lastDayOfQuarter);
+    lastDayOfQuarter.tm_mday -= 1;
+    Normalize(lastDayOfQuarter);
+    
+    return lastDayOfQuarter;
 }
 
 typedef std::tm (*PeriodProcessingDelegate)(std::tm curDate);
@@ -131,7 +201,7 @@ static void MainProcess(std::string sPeriodType, std::string sPeriod)
     vecPeriods listOfPeriods;
 
     //2020-01-10 2020-03-25
-    std::string format = " %Y-%m-%d";
+    std::string format = "%Y-%m-%d";
     std::tm startDate = { 0 };
     std::tm endDate = { 0 };
     try
@@ -153,22 +223,22 @@ static void MainProcess(std::string sPeriodType, std::string sPeriod)
     {
         ProcessPeriod(listOfPeriods, startDate, endDate, WEEKEndDate);
     }
-    //if (sPeriodType == "MONTH")
-    //{
-    //    listOfPeriods = ProcessPeriod(startDate, endDate, MONTHEndDate);
-    //}
-    //if (sPeriodType == "REVIEW")
-    //{
-    //    listOfPeriods = ProcessPeriod(startDate, endDate, REVIEWEndDate);
-    //}
-    //if (sPeriodType == "YEAR")
-    //{
-    //    listOfPeriods = ProcessPeriod(startDate, endDate, YEAREndDate);
-    //}
-    //if (sPeriodType == "QUARTER")
-    //{
-    //    listOfPeriods = ProcessPeriod(startDate, endDate, QUARTEREndDate);
-    //}
+    if (sPeriodType == "MONTH")
+    {
+        ProcessPeriod(listOfPeriods, startDate, endDate, MONTHEndDate);
+    }
+    if (sPeriodType == "REVIEW")
+    {
+        ProcessPeriod(listOfPeriods, startDate, endDate, REVIEWEndDate);
+    }
+    if (sPeriodType == "YEAR")
+    {
+        ProcessPeriod(listOfPeriods, startDate, endDate, YEAREndDate);
+    }
+    if (sPeriodType == "QUARTER")
+    {
+        ProcessPeriod(listOfPeriods, startDate, endDate, QUARTEREndDate);
+    }
 
     std::cout << listOfPeriods.size();
     std::cout << "\n";
@@ -194,21 +264,22 @@ int main()
     /*std::getline(std::cin, sPeriodType);
     std::getline(std::cin, sPeriod);*/
 
-    //string sPeriodType = "MONTH";
-    //string sPeriod = "2020-01-10 2020-03-25";
+    //sPeriodType = "MONTH";
+    //sPeriod = "2020-01-10 2020-03-25";
+    
 
-    sPeriodType = "WEEK";
-    sPeriod = "2020-01-26 2020-03-23";
+    //sPeriodType = "WEEK";
+    //sPeriod = "2020-01-26 2020-03-23";
 
 
-    //string sPeriodType = "REVIEW";
-    //string sPeriod = "2016-09-20 2022-11-30";
+    //sPeriodType = "REVIEW";
+    //sPeriod = "2016-09-20 2022-11-30";
 
-    //string sPeriodType = "YEAR";
-    //string sPeriod = "2016-09-20 2022-11-30";
+    //sPeriodType = "YEAR";
+    //sPeriod = "2016-09-20 2022-11-30";
 
-    //string sPeriodType = "QUARTER";
-    //string sPeriod = "2016-09-20 2022-11-30";
+    sPeriodType = "QUARTER";
+    sPeriod = "2016-09-20 2022-11-30";
 
     MainProcess(sPeriodType, sPeriod);
 }
