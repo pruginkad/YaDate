@@ -50,18 +50,20 @@ static void CheckIfEndOfPeriodCorrect(Period& temp_pair, std::tm endDate)
 static void Normalize(std::tm& curDate)
 {
     time_t next = mktime(&curDate);
-    std::tm* date = localtime(&next);
-    auto stack = *date;
-    curDate = stack;
+    //std::tm* date = localtime(&next);
+    //auto stack = *date;
+    //curDate = stack;
 }
 
 static std::tm AddDays(std::tm curDate, int days)
 {
     curDate.tm_mday += days;
     time_t next = mktime(&curDate);
-    std::tm* date = localtime(&next);
-    auto stack = *date;
-    return stack;
+    return curDate;
+
+    //std::tm* date = localtime(&next);
+    //auto stack = *date;
+    //return stack;
 }
 
 static int GetDaysInMonth(std::tm curDate)
@@ -71,7 +73,7 @@ static int GetDaysInMonth(std::tm curDate)
     for (i = 28; i <= 31; i++)
     {
         date.tm_mday = i;
-        Normalize(date);
+        mktime(&date);
         if (date.tm_mon != curDate.tm_mon)
         {
             break;
@@ -272,14 +274,14 @@ int main()
     //sPeriod = "2020-01-26 2020-03-23";
 
 
-    //sPeriodType = "REVIEW";
-    //sPeriod = "2016-09-20 2022-11-30";
+    sPeriodType = "REVIEW";
+    sPeriod = "2016-09-20 2022-11-30";
 
     //sPeriodType = "YEAR";
     //sPeriod = "2016-09-20 2022-11-30";
 
-    sPeriodType = "QUARTER";
-    sPeriod = "2016-09-20 2022-11-30";
+    //sPeriodType = "QUARTER";
+    //sPeriod = "2016-09-20 2022-11-30";
 
     MainProcess(sPeriodType, sPeriod);
 }
