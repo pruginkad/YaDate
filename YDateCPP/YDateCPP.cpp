@@ -66,11 +66,11 @@ static std::tm AddDays(std::tm curDate, int days)
     //return stack;
 }
 
-static int GetDaysInMonth(std::tm curDate)
+static int GetDaysInMonth(const std::tm curDate)
 {
     std::tm date = curDate;
     int i = 0;
-    for (i = 28; i <= 31; i++)
+    for (i = 29; i <= 31; i++)
     {
         date.tm_mday = i;
         mktime(&date);
@@ -266,16 +266,16 @@ int main()
     /*std::getline(std::cin, sPeriodType);
     std::getline(std::cin, sPeriod);*/
 
-    //sPeriodType = "MONTH";
-    //sPeriod = "2020-01-10 2020-03-25";
+    sPeriodType = "MONTH";
+    sPeriod = "2020-01-10 2020-03-25";
     
 
     //sPeriodType = "WEEK";
     //sPeriod = "2020-01-26 2020-03-23";
 
 
-    sPeriodType = "REVIEW";
-    sPeriod = "2016-09-20 2022-11-30";
+    //sPeriodType = "REVIEW";
+    //sPeriod = "2016-09-20 2022-11-30";
 
     //sPeriodType = "YEAR";
     //sPeriod = "2016-09-20 2022-11-30";
