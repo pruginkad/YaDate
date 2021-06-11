@@ -186,7 +186,7 @@ static void MainProcess(std::string sPeriodType, std::string sPeriod)
     size_t pos = 0;
     std::string arDates[2];
     std::string sEndDate;
-    for(int i = 0; i < 2; i++)
+    
     {
         if ((pos = sPeriod.find(' ')) == std::string::npos)
         {
